@@ -1,6 +1,6 @@
 ---
 name: slide-deck
-description: Generates professional slide deck images from content. Creates outlines with style instructions, then generates individual slide images. Use when user asks to "create slides", "make a presentation", "generate deck", "slide deck", or "PPT".
+description: Generates professional slide deck images from content. Creates outlines with style instructions, then generates individual slide images via AI image generation. Use when user asks to "create slides", "make a presentation", "generate deck", "slide deck", or "PPT".
 ---
 
 # Slide Deck Generator
@@ -11,11 +11,9 @@ Transform content into professional slide deck images.
 
 ```bash
 /slide-deck path/to/content.md
-/slide-deck path/to/content.md --style sketch-notes
+/slide-deck path/to/content.md --style corporate
 /slide-deck path/to/content.md --audience executives
-/slide-deck path/to/content.md --lang zh
-/slide-deck path/to/content.md --slides 10
-/slide-deck path/to/content.md --outline-only
+/slide-deck path/to/content.md --slides 15
 /slide-deck  # Then paste content
 ```
 
@@ -27,289 +25,186 @@ Transform content into professional slide deck images.
 
 | Script | Purpose |
 |--------|---------|
-| `scripts/merge-to-pptx.ts` | Merge slides into PowerPoint |
-| `scripts/merge-to-pdf.ts` | Merge slides into PDF |
+| `scripts/merge-to-pptx.ts` | Merge slide images into PowerPoint |
+| `scripts/merge-to-pdf.ts` | Merge slide images into PDF |
 
 ## Options
 
 | Option | Description |
 |--------|-------------|
-| `--style <name>` | Visual style: preset name, `custom`, or custom style name |
-| `--audience <type>` | Target: beginners, intermediate, experts, executives, general |
+| `--style <name>` | Visual style preset or `custom` |
+| `--audience <type>` | beginners, intermediate, experts, executives, general |
 | `--lang <code>` | Output language (en, zh, ja, ko, etc.) |
-| `--slides <number>` | Target slide count (8-25 recommended, max 30) |
-| `--outline-only` | Generate outline only, skip image generation |
+| `--slides <number>` | Target slide count |
+| `--outline-only` | Generate outline only, skip images |
 | `--prompts-only` | Generate outline + prompts, skip images |
-| `--images-only` | Generate images from existing prompts directory |
-| `--regenerate <N>` | Regenerate specific slide(s): `--regenerate 3` or `--regenerate 2,5,8` |
+| `--images-only` | Generate images from existing prompts/ directory |
+| `--regenerate <N>` | Regenerate specific slide(s): `3` or `2,5,8` |
 
-**Slide Count by Content Length**:
-| Content | Slides |
-|---------|--------|
-| < 1000 words | 5-10 |
-| 1000-3000 words | 10-18 |
-| 3000-5000 words | 15-25 |
-| > 5000 words | 20-30 (consider splitting) |
+## Workflow
 
-## Style System
+```
+Input → Analyze → Confirm → Outline → [Review?] → Prompts → [Review?] → Images → Merge → Done
+```
 
-### Presets
+### Step 1: Analyze Content
 
-| Preset | Dimensions | Best For |
-|--------|------------|----------|
-| `blueprint` (Default) | grid + cool + technical + balanced | Architecture, system design |
-| `corporate` | clean + professional + geometric + balanced | Investor decks, proposals |
-| `minimal` | clean + neutral + geometric + minimal | Executive briefings |
-| `sketch-notes` | organic + warm + handwritten + balanced | Educational, tutorials |
-| `dark-atmospheric` | clean + dark + editorial + balanced | Entertainment, gaming |
-| `bold-editorial` | clean + vibrant + editorial + balanced | Product launches, keynotes |
+1. Save source content (if pasted, save as `source.md`)
+2. Extract core message (one sentence, <=15 words)
+3. Identify 3-5 supporting points
+4. Detect content signals for style recommendation:
 
-### Style Dimensions
-
-| Dimension | Options | Description |
-|-----------|---------|-------------|
-| **Texture** | clean, grid, organic, pixel, paper | Visual texture and background treatment |
-| **Mood** | professional, warm, cool, vibrant, dark, neutral | Color temperature and palette style |
-| **Typography** | geometric, humanist, handwritten, editorial, technical | Headline and body text styling |
-| **Density** | minimal, balanced, dense | Information density per slide |
-
-Full specs: `references/dimensions/*.md`
-
-### Auto Style Selection
-
-| Content Signals | Preset |
-|-----------------|--------|
+| Content Signals | Recommended Style |
+|-----------------|-------------------|
 | tutorial, learn, education, guide | `sketch-notes` |
 | architecture, system, data, technical | `blueprint` |
-| executive, minimal, clean | `minimal` |
 | investor, quarterly, business, corporate | `corporate` |
-| launch, marketing, keynote | `bold-editorial` |
+| executive, minimal, clean, simple | `minimal` |
+| launch, marketing, keynote, magazine | `bold-editorial` |
 | entertainment, music, gaming | `dark-atmospheric` |
 | Default | `blueprint` |
 
-## Design Philosophy
+5. Determine slide count by content length:
 
-Decks designed for **reading and sharing**, not live presentation:
-- Each slide self-explanatory without verbal commentary
-- Logical flow when scrolling
-- All necessary context within each slide
-- Optimized for social media sharing
+| Content Length | Slides |
+|---------------|--------|
+| < 1000 words | 5-10 |
+| 1000-3000 words | 10-18 |
+| 3000-5000 words | 15-25 |
+| > 5000 words | 20-30 |
 
-See `references/design-guidelines.md` for:
-- Audience-specific principles
-- Visual hierarchy
-- Content density guidelines
-- Color and typography selection
+6. Detect source language, generate topic slug (2-4 words, kebab-case)
+7. Check existing: `test -d "slide-deck/{topic-slug}" && echo "exists"`
 
-See `references/layouts.md` for layout options.
+### Step 2: Confirmation
 
-## File Management
+Use AskUserQuestion for all questions at once:
 
-### Output Directory
+**Q1: Style** → Recommended preset + alternative + "Custom dimensions" option
+**Q2: Audience** → General (default), Beginners, Experts, Executives
+**Q3: Slide Count** → Recommended, Fewer (N-3), More (N+3)
+**Q4: Review Outline?** → Yes (recommended) / No
+**Q5: Review Prompts?** → Yes (recommended) / No
+
+If "Custom dimensions" selected, Round 2: ask Texture, Mood, Typography, Density.
+
+### Step 3: Generate Outline
+
+Save as `slide-deck/{topic-slug}/outline.md`. The outline has two parts:
+
+**Part 1: `<STYLE_INSTRUCTIONS>` block** — Single Source of Truth for style across all prompts. Build from the selected preset or custom dimensions. Contains: Design Aesthetic, Background, Typography, Color Palette (hex codes), Visual Elements, Density Guidelines, Style Rules (Do/Don't).
+
+**Part 2: Slide entries** — Each slide has these sections:
+
+```markdown
+## Slide X of N
+
+**Type**: Cover | Content | Back Cover
+**Filename**: NN-slide-{slug}.png
+
+// NARRATIVE GOAL
+[What this slide achieves in the story arc]
+
+// KEY CONTENT
+Headline: [narrative headline, not label]
+Sub-headline: [supporting context]
+Body:
+- [point with specific detail]
+- [point with specific detail]
+
+// VISUAL
+[Detailed visual description - specific elements, composition, mood]
+
+// LAYOUT
+Layout: [layout name from gallery]
+[Composition and spatial arrangement]
+```
+
+**Outline Rules**:
+- Headlines are narrative ("Usage doubled in 6 months"), not labels ("Key Statistics")
+- Each slide = ONE clear message
+- Every detail fully specified, no placeholders
+- Back Cover: meaningful close (CTA, takeaway), not just "Thank you"
+
+### Step 4: Review Outline (Conditional)
+
+Skip if user chose "No" in Q4. Display slide summary table → proceed / edit / regenerate.
+
+### Step 5: Generate Prompts
+
+For each slide in outline:
+1. Read `${SKILL_DIR}/base-prompt.md` (image generation template)
+2. Replace `[STYLE_INSTRUCTIONS_HERE]` with `<STYLE_INSTRUCTIONS>` block from outline
+3. Replace `[SLIDE_CONTENT_HERE]` with the slide's content section
+4. Replace `[LANGUAGE_HERE]` with target language
+5. Save to `slide-deck/{topic-slug}/prompts/NN-slide-{slug}.md`
+
+### Step 6: Review Prompts (Conditional)
+
+Skip if user chose "No" in Q5.
+
+### Step 7: Generate Images
+
+For each prompt file in `prompts/`:
+```bash
+# Configure your image generation backend here
+npx -y bun path/to/image-gen.ts --promptfiles prompts/NN-slide-{slug}.md --image NN-slide-{slug}.png
+```
+Generate sequentially, report "Generated X/N", auto-retry once on failure.
+
+### Step 8: Merge
+
+```bash
+npx -y bun ${SKILL_DIR}/scripts/merge-to-pptx.ts slide-deck/{topic-slug}/
+npx -y bun ${SKILL_DIR}/scripts/merge-to-pdf.ts slide-deck/{topic-slug}/
+```
+
+### Step 9: Summary
+
+Report topic, style, location, file list.
+
+## Style Presets Quick Reference
+
+| Preset | Texture | Mood | Typography | Density |
+|--------|---------|------|------------|---------|
+| `blueprint` | grid | cool | technical | balanced |
+| `corporate` | clean | professional | geometric | balanced |
+| `minimal` | clean | neutral | geometric | minimal |
+| `sketch-notes` | organic | warm | handwritten | balanced |
+| `bold-editorial` | clean | vibrant | editorial | balanced |
+| `dark-atmospheric` | clean | dark | editorial | balanced |
+
+## Layout Gallery
+
+| Layout | Best For |
+|--------|----------|
+| `title-hero` | Cover slides, section breaks |
+| `split-screen` | Comparisons, feature highlights |
+| `icon-grid` | Features, capabilities |
+| `two-columns` / `three-columns` | Paired/triple info |
+| `key-stat` | Single impactful metric |
+| `quote-callout` | Testimonials, key insights |
+| `bullet-list` | Simple content |
+| `linear-progression` | Timelines, steps |
+| `binary-comparison` | Before/after, pros-cons |
+| `hub-spoke` | Concept maps, ecosystems |
+| `dashboard` | KPIs, data display |
+| `funnel` | Conversion stages |
+| `winding-roadmap` | Journey, milestones |
+| `hierarchical-layers` | Priority, importance |
+
+## File Structure
 
 ```
 slide-deck/{topic-slug}/
 ├── source-{slug}.{ext}
 ├── outline.md
 ├── prompts/
-│   └── 01-slide-cover.md, 02-slide-{slug}.md, ...
-├── 01-slide-cover.png, 02-slide-{slug}.png, ...
+│   ├── 01-slide-cover.md
+│   ├── 02-slide-{slug}.md
+│   └── ...
+├── 01-slide-cover.png
+├── 02-slide-{slug}.png
 ├── {topic-slug}.pptx
 └── {topic-slug}.pdf
 ```
-
-## Language Handling
-
-**Detection Priority**:
-1. `--lang` flag (explicit)
-2. User's conversation language
-3. Source content language
-
-## Workflow
-
-```
-Slide Deck Progress:
-- [ ] Step 1: Setup & Analyze
-  - [ ] 1.1 Analyze content
-  - [ ] 1.2 Check existing
-- [ ] Step 2: Confirmation (style, audience, slides, review preferences)
-- [ ] Step 3: Generate outline
-- [ ] Step 4: Review outline (conditional)
-- [ ] Step 5: Generate prompts
-- [ ] Step 6: Review prompts (conditional)
-- [ ] Step 7: Generate images
-- [ ] Step 8: Merge to PPTX/PDF
-- [ ] Step 9: Output summary
-```
-
-### Flow
-
-```
-Input → Analyze → Confirm (1-2 rounds) → Outline → [Review?] → Prompts → [Review?] → Images → Merge → Complete
-```
-
-### Step 1: Setup & Analyze
-
-**1.1 Analyze Content**
-
-1. Save source content (if pasted, save as `source.md`)
-2. Follow `references/analysis-framework.md` for content analysis
-3. Analyze content signals for style recommendations
-4. Detect source language
-5. Determine recommended slide count
-6. Generate topic slug from content
-
-**1.2 Check Existing Content**
-
-Use Bash to check if output directory exists:
-
-```bash
-test -d "slide-deck/{topic-slug}" && echo "exists"
-```
-
-**If directory exists**, use AskUserQuestion:
-
-```
-header: "Existing"
-question: "Existing content found. How to proceed?"
-options:
-  - label: "Regenerate outline"
-    description: "Keep images, regenerate outline only"
-  - label: "Regenerate images"
-    description: "Keep outline, regenerate images only"
-  - label: "Backup and regenerate"
-    description: "Backup to {slug}-backup-{timestamp}, then regenerate all"
-  - label: "Exit"
-    description: "Cancel, keep existing content unchanged"
-```
-
-**Save to `analysis.md`** with:
-- Topic, audience, content signals
-- Recommended style (based on Auto Style Selection)
-- Recommended slide count
-- Language detection
-
-### Step 2: Confirmation
-
-**Two-round confirmation**: Round 1 always, Round 2 only if "Custom dimensions" selected.
-
-#### Round 1 (Always)
-
-**Use AskUserQuestion** for all 5 questions:
-
-**Q1: Style** → Recommended preset + alternative + custom dimensions option
-**Q2: Audience** → General, Beginners, Experts, Executives
-**Q3: Slide Count** → Recommended ± 3
-**Q4: Review Outline** → Yes/No
-**Q5: Review Prompts** → Yes/No
-
-#### Round 2 (Only if "Custom dimensions" selected)
-
-**Use AskUserQuestion** for 4 dimensions: Texture, Mood, Typography, Density
-
-### Step 3: Generate Outline
-
-1. Read style spec: `references/styles/{preset}.md` or combine from `references/dimensions/`
-2. Follow `references/outline-template.md` for structure
-3. Build `<STYLE_INSTRUCTIONS>` block (single source of truth for style)
-4. Apply confirmed audience, language, slide count
-5. Save as `outline.md`
-
-### Step 4: Review Outline (Conditional)
-
-**Skip** if user selected "No, skip outline review" in Step 2.
-
-Display slide-by-slide summary table → Ask proceed/edit/regenerate.
-
-### Step 5: Generate Prompts
-
-For each slide in outline:
-1. Read `references/base-prompt.md` (template)
-2. Copy `<STYLE_INSTRUCTIONS>` from outline (NOT from style file again)
-3. Add slide-specific content (headline, body, visual, layout)
-4. Save to `prompts/NN-slide-{slug}.md`
-
-**This is the key step**: base-prompt template + STYLE_INSTRUCTIONS + slide content = final image generation prompt.
-
-### Step 6: Review Prompts (Conditional)
-
-**Skip** if user selected "No, skip prompt review" in Step 2.
-
-### Step 7: Generate Images
-
-**IMAGE GENERATION BACKEND**: This skill requires an image generation tool/API.
-
-Configure your image generation command in this section:
-
-```bash
-# Example: using a local image generation script
-npx -y bun path/to/image-gen.ts --promptfiles prompts/01-slide-cover.md --image 01-slide-cover.png
-
-# Example: using an API-based generator
-# Adapt to your available image generation tool
-```
-
-**Flow**:
-1. For each slide prompt file in `prompts/`:
-   - Generate image sequentially
-   - Report progress: "Generated X/N"
-   - Auto-retry once on failure
-2. All images saved as `NN-slide-{slug}.png`
-
-### Step 8: Merge to PPTX and PDF
-
-```bash
-npx -y bun ${SKILL_DIR}/scripts/merge-to-pptx.ts <slide-deck-dir>
-npx -y bun ${SKILL_DIR}/scripts/merge-to-pdf.ts <slide-deck-dir>
-```
-
-### Step 9: Output Summary
-
-```
-Slide Deck Complete!
-
-Topic: [topic]
-Style: [preset name or custom dimensions]
-Location: [directory path]
-Slides: N total
-
-- 01-slide-cover.png - Cover
-- 02-slide-intro.png - Content
-- ...
-- {NN}-slide-back-cover.png - Back Cover
-
-Outline: outline.md
-PPTX: {topic-slug}.pptx
-PDF: {topic-slug}.pdf
-```
-
-## Partial Workflows
-
-| Option | Workflow |
-|--------|----------|
-| `--outline-only` | Steps 1-3 only |
-| `--prompts-only` | Steps 1-5 |
-| `--images-only` | Skip to Step 7 |
-| `--regenerate N` | Regenerate specific slide(s) only |
-
-## Slide Modification
-
-| Action | Steps |
-|--------|-------|
-| **Edit** | Update prompt → `--regenerate N` → Regenerate PDF |
-| **Add** | Create prompt → Generate image → Renumber → Update outline → Regenerate PDF |
-| **Delete** | Remove files → Renumber → Update outline → Regenerate PDF |
-
-## References
-
-| File | Content |
-|------|---------|
-| `references/analysis-framework.md` | Content analysis for presentations |
-| `references/outline-template.md` | Outline structure and format |
-| `references/content-rules.md` | Content and style guidelines |
-| `references/design-guidelines.md` | Audience, typography, colors |
-| `references/layouts.md` | Layout options and selection tips |
-| `references/base-prompt.md` | Base prompt for image generation |
-| `references/dimensions/*.md` | Dimension specifications |
-| `references/dimensions/presets.md` | Preset to dimension mapping |
-| `references/styles/<style>.md` | Full style specifications |

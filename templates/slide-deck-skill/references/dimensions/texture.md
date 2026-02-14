@@ -1,40 +1,60 @@
 # Texture Dimension
 
-Background and surface treatment.
+Visual texture and background treatment.
 
 ## Options
 
+| Option | Background | Visual Elements | Best For |
+|--------|------------|-----------------|----------|
+| `clean` | Pure solid color, no texture | Clean lines, geometric shapes | Executive, minimal, corporate |
+| `grid` | Subtle grid overlay | Grid lines, schematics, technical diagrams | Technical, architecture, engineering |
+| `organic` | Soft textures, hand-drawn feel | Brush strokes, watercolor, sketchy lines | Creative, educational, friendly |
+| `pixel` | Chunky pixels, 8-bit aesthetic | Pixel art, retro game elements | Gaming, developer, nostalgic |
+| `paper` | Aged/textured paper | Vintage elements, stamps, weathering | Historical, heritage, storytelling |
+
+## Rendering Guidelines
+
 ### clean
-- **Feel**: Digital precision, crisp edges
-- **Background**: Solid color, no texture
-- **Elements**: Sharp lines, perfect geometry
-- **Do**: Maintain sharp edges, use grid alignment
-- **Don't**: Use hand-drawn elements, add noise/grain
+
+- Solid background colors with no visible texture
+- Crisp, sharp edges on all elements
+- Digital precision and clarity
+- Maximum contrast for readability
 
 ### grid
-- **Feel**: Engineering, technical precision
-- **Background**: Subtle grid overlay (light lines)
-- **Elements**: Dimension lines, technical schematics, blueprint-style diagrams
-- **Do**: Show precise measurements, use technical diagrams
-- **Don't**: Use organic curves, hand-drawn elements
+
+- Light grid overlay (5-10% opacity)
+- Engineering paper or blueprint feel
+- Alignment guides visible but subtle
+- Technical drawing aesthetic
 
 ### organic
-- **Feel**: Hand-drawn, natural, soft
-- **Background**: Slight texture, off-white or cream
-- **Elements**: Brush strokes, doodles, imperfect shapes
-- **Do**: Allow imperfection, layer with subtle overlaps
-- **Don't**: Use perfect geometry, sharp edges
+
+- Paper grain or canvas texture
+- Imperfect edges, natural variations
+- Hand-painted color fills
+- Casual, approachable feel
 
 ### pixel
-- **Feel**: 8-bit retro, chunky
-- **Background**: Pixel grid (visible square cells)
-- **Elements**: Pixel art icons, blocky shapes
-- **Do**: Keep aliased edges, use chunky elements
-- **Don't**: Smooth edges, anti-alias
+
+- Visible pixel grid (chunky, not fine)
+- 8-bit color palette aesthetic
+- Aliased edges (no smoothing)
+- Retro game UI elements
 
 ### paper
-- **Feel**: Vintage, aged, heritage
-- **Background**: Aged paper texture, slight yellowing
-- **Elements**: Vintage stamps, aged overlays, sepia tones
-- **Do**: Add subtle aging effects, use warm undertones
-- **Don't**: Use bright digital colors, modern effects
+
+- Aged paper texture (subtle creases, discoloration)
+- Vintage printing artifacts
+- Sepia or warm tones
+- Historical document feel
+
+## Combination Notes
+
+| Texture | Works Best With | Avoid With |
+|---------|-----------------|------------|
+| clean | professional, neutral moods | handwritten typography |
+| grid | cool, professional moods | handwritten, vibrant moods |
+| organic | warm, vibrant moods | technical typography |
+| pixel | vibrant, dark moods | editorial typography |
+| paper | warm moods | geometric typography, minimal density |

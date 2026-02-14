@@ -1,43 +1,47 @@
 # Layout Gallery
 
-Optional layout hints for individual slides. Specify in outline's `// LAYOUT` section.
+Optional layout hints for slides. Specify in outline's `// LAYOUT` section.
 
-## Slide-Specific Layouts
+## Slide Layouts
 
 | Layout | Description | Best For |
 |--------|-------------|----------|
 | `title-hero` | Large centered title + subtitle | Cover slides, section breaks |
-| `quote-callout` | Featured quote with attribution | Testimonials, key insights |
-| `key-stat` | Single large number as focal point | Impact statistics, metrics |
-| `split-screen` | Half image, half text | Feature highlights, comparisons |
+| `split-screen` | Half visual, half text | Comparisons, feature highlights |
 | `icon-grid` | Grid of icons with labels | Features, capabilities, benefits |
-| `two-columns` | Content in balanced columns | Paired information, dual points |
-| `three-columns` | Content in three columns | Triple comparisons, categories |
-| `image-caption` | Full-bleed image + text overlay | Visual storytelling, emotional |
-| `agenda` | Numbered list with highlights | Session overview, roadmap |
-| `bullet-list` | Structured bullet points | Simple content, lists |
+| `two-columns` | Balanced dual columns | Paired information |
+| `three-columns` | Triple columns | Comparisons, categories |
+| `key-stat` | Single large number focal point | Impact statistics, metrics |
+| `quote-callout` | Featured quote with attribution | Testimonials, key insights |
+| `bullet-list` | Structured bullet points | Simple content lists |
 
-## Infographic-Derived Layouts
+## Infographic Layouts
 
 | Layout | Description | Best For |
 |--------|-------------|----------|
 | `linear-progression` | Sequential flow left-to-right | Timelines, step-by-step |
 | `binary-comparison` | Side-by-side A vs B | Before/after, pros-cons |
-| `hierarchical-layers` | Pyramid or stacked levels | Priority, importance |
 | `hub-spoke` | Central node with radiating items | Concept maps, ecosystems |
-| `bento-grid` | Varied-size tiles | Overview, summary |
+| `dashboard` | Metrics grid with charts/numbers | KPIs, data display |
 | `funnel` | Narrowing stages | Conversion, filtering |
-| `dashboard` | Metrics with charts/numbers | KPIs, data display |
+| `hierarchical-layers` | Pyramid or stacked levels | Priority, importance |
 | `winding-roadmap` | Curved path with milestones | Journey, timeline |
+| `bento-grid` | Varied-size tiles | Overview, summary |
 
-## Layout Selection Tips
+## Selection Tips
 
-| Content Type | Recommended Layouts |
-|--------------|-------------------|
-| Single narrative | `bullet-list`, `image-caption` |
+| Content Type | Recommended |
+|--------------|-------------|
+| Single narrative | `bullet-list`, `key-stat` |
 | Two concepts | `split-screen`, `binary-comparison` |
 | Three items | `three-columns`, `icon-grid` |
 | Process/Steps | `linear-progression`, `winding-roadmap` |
 | Data/Metrics | `dashboard`, `key-stat` |
 | Relationships | `hub-spoke` |
-| Hierarchy | `hierarchical-layers` |
+| Hierarchy | `hierarchical-layers`, `funnel` |
+
+| Position | Recommended |
+|----------|-------------|
+| Opening | `title-hero` |
+| Middle | Content-specific |
+| Closing | `quote-callout`, `key-stat` |

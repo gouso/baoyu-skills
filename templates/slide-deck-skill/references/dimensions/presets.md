@@ -1,4 +1,4 @@
-# Preset -> Dimension Mapping
+# Preset to Dimension Mapping
 
 ## Mapping Table
 
@@ -8,40 +8,40 @@
 | corporate | clean | professional | geometric | balanced |
 | minimal | clean | neutral | geometric | minimal |
 | sketch-notes | organic | warm | handwritten | balanced |
-| dark-atmospheric | clean | dark | editorial | balanced |
 | bold-editorial | clean | vibrant | editorial | balanced |
+| dark-atmospheric | clean | dark | editorial | balanced |
 
 ## Preset Details
 
 ### blueprint
 - **Dimensions**: grid + cool + technical + balanced
 - **Feel**: Engineering precision, analytical clarity
-- **Auto-select**: architecture, system, data, analysis, technical
+- **Auto-select signals**: architecture, system, data, analysis, technical
 
 ### corporate
 - **Dimensions**: clean + professional + geometric + balanced
 - **Feel**: Business credibility, institutional trust
-- **Auto-select**: investor, quarterly, business, corporate
+- **Auto-select signals**: investor, quarterly, business, corporate
 
 ### minimal
 - **Dimensions**: clean + neutral + geometric + minimal
 - **Feel**: Maximum sophistication, executive focus
-- **Auto-select**: executive, minimal, clean, simple
+- **Auto-select signals**: executive, minimal, clean, simple
 
 ### sketch-notes
 - **Dimensions**: organic + warm + handwritten + balanced
 - **Feel**: Friendly learning, approachable education
-- **Auto-select**: tutorial, learn, education, guide, beginner
-
-### dark-atmospheric
-- **Dimensions**: clean + dark + editorial + balanced
-- **Feel**: Cinematic, entertainment
-- **Auto-select**: entertainment, music, gaming, atmospheric
+- **Auto-select signals**: tutorial, learn, education, guide, beginner
 
 ### bold-editorial
 - **Dimensions**: clean + vibrant + editorial + balanced
 - **Feel**: Magazine impact, keynote drama
-- **Auto-select**: launch, marketing, keynote, magazine
+- **Auto-select signals**: launch, marketing, keynote, magazine
+
+### dark-atmospheric
+- **Dimensions**: clean + dark + editorial + balanced
+- **Feel**: Cinematic, entertainment
+- **Auto-select signals**: entertainment, music, gaming, atmospheric
 
 ## Building Custom Combinations
 
